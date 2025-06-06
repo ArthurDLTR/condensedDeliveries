@@ -134,7 +134,7 @@ class ActionsCondensedDeliveries {
             
             if ($res > 0) {
                 $db->commit();
-                $texttoshow = $langs->trans('CD_CREATED_EXPE').' (<a href="'.DOL_URL_ROOT.'/expedition/card.php?id='.$expe->id.'">PROV_'.$expe->id.'</a>)';
+                $texttoshow = $langs->trans('CD_CREATED_EXPE').' (<a href="'.DOL_URL_ROOT.'/expedition/card.php?id='.$expe->id.'">PROV'.$expe->id.'</a>)';
                 setEventMessages($texttoshow, null, 'mesgs');
 
                 // Make a redirect to avoid to bill twice if we make a refresh or back

@@ -72,7 +72,7 @@ class modCondensedDeliveries extends DolibarrModules
 		$this->editor_url = '';
 
 		// Possible values for version are: 'development', 'experimental', 'dolibarr', 'dolibarr_deprecated', 'experimental_deprecated' or a version string like 'x.y.z'
-		$this->version = '0.1';
+		$this->version = '0.2';
 		// Url to the file with your last numberversion of this module
 		//$this->url_last_version = 'http://www.example.com/versionmodule.txt';
 
@@ -294,21 +294,21 @@ class modCondensedDeliveries extends DolibarrModules
 		$r = 0;
 		// Add here entries to declare new menus
 		/* BEGIN MODULEBUILDER TOPMENU */
-		$this->menu[$r++] = array(
-			'fk_menu'=>'', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
-			'type'=>'top', // This is a Top menu entry
-			'titre'=>'ModuleCondensedDeliveriesName',
-			'prefix' => img_picto('', $this->picto, 'class="pictofixedwidth valignmiddle"'),
-			'mainmenu'=>'condenseddeliveries',
-			'leftmenu'=>'',
-			'url'=>'/condenseddeliveries/condenseddeliveriesindex.php',
-			'langs'=>'condenseddeliveries@condenseddeliveries', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
-			'position'=>1000 + $r,
-			'enabled'=>'isModEnabled("condenseddeliveries")', // Define condition to show or hide menu entry. Use 'isModEnabled("condenseddeliveries")' if entry must be visible if module is enabled.
-			'perms'=>'1', // Use 'perms'=>'$user->hasRight("condenseddeliveries", "myobject", "read")' if you want your menu with a permission rules
-			'target'=>'',
-			'user'=>2, // 0=Menu for internal users, 1=external users, 2=both
-		);
+		// $this->menu[$r++] = array(
+		// 	'fk_menu'=>'', // '' if this is a top menu. For left menu, use 'fk_mainmenu=xxx' or 'fk_mainmenu=xxx,fk_leftmenu=yyy' where xxx is mainmenucode and yyy is a leftmenucode
+		// 	'type'=>'top', // This is a Top menu entry
+		// 	'titre'=>'ModuleCondensedDeliveriesName',
+		// 	'prefix' => img_picto('', $this->picto, 'class="pictofixedwidth valignmiddle"'),
+		// 	'mainmenu'=>'condenseddeliveries',
+		// 	'leftmenu'=>'',
+		// 	'url'=>'/condenseddeliveries/condenseddeliveriesindex.php',
+		// 	'langs'=>'condenseddeliveries@condenseddeliveries', // Lang file to use (without .lang) by module. File must be in langs/code_CODE/ directory.
+		// 	'position'=>1000 + $r,
+		// 	'enabled'=>'isModEnabled("condenseddeliveries")', // Define condition to show or hide menu entry. Use 'isModEnabled("condenseddeliveries")' if entry must be visible if module is enabled.
+		// 	'perms'=>'1', // Use 'perms'=>'$user->hasRight("condenseddeliveries", "myobject", "read")' if you want your menu with a permission rules
+		// 	'target'=>'',
+		// 	'user'=>2, // 0=Menu for internal users, 1=external users, 2=both
+		// );
 		/* END MODULEBUILDER TOPMENU */
 		/* BEGIN MODULEBUILDER LEFTMENU MYOBJECT */
 		/*

@@ -18,9 +18,9 @@
 #
 
 # Module label 'ModuleCondensedDeliveriesName'
-ModuleCondensedDeliveriesName = CondensedDeliveries
+ModuleCondensedDeliveriesName = Fusion of deliveries
 # Module description 'ModuleCondensedDeliveriesDesc'
-ModuleCondensedDeliveriesDesc = CondensedDeliveries description
+ModuleCondensedDeliveriesDesc = Module to create deliveries with multiple orders
 
 #
 # Admin page
@@ -52,3 +52,7 @@ MyPageName = My page name
 #
 MyWidget = My widget
 MyWidgetDescription = My widget description
+
+CreateCondensedDeliveries = Create delivery
+CD_CREATED_EXPE = Delivery created
+CD_NOT_SAME_THIRDPARTY = All the orders should have the same thirdparty
