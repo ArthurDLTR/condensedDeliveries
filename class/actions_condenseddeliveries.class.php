@@ -73,11 +73,13 @@ class ActionsCondensedDeliveries {
             $expe->thirdparty = $comm->thirdparty;
             $expe->date = dol_now();
             $expe->array_options = $comm->array_options;
-
+            $arrayIds = array();
             
             foreach ($arrayOrders as $id){
-                $res = $expe->add_object_linked('commande', $id);
-                $comm->fetch($id);
+                // $expe->add_object_linked('order', $id);
+                $arrayIds[] = $id;
+                $res = $comm->fetch($id);
+                dol_syslog("Id de la commande : ".$id." Trouvé ? ".$res."<br>");
 
                 if ($res > 0){
                     $lines = $comm->lines;
@@ -131,6 +133,11 @@ class ActionsCondensedDeliveries {
             }
 
             $res = $expe->create($user);
+            
+            // Add all the linked orders to the expedition
+            foreach ($arrayIds as $id){
+                $expe->add_object_linked('order', $id);
+            }
             
             if ($res > 0) {
                 $db->commit();
