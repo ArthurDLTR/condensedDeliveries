@@ -1,5 +1,8 @@
 # CHANGELOG CONDENSEDDELIVERIES FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## 0.3
+Prise en compte des quantités déjà expédiées et option pour l'ouverture de l'expédition créée.
+
 ## 0.2
 Création de livraisons fonctionnelle à partir de plusieurs commandes
 

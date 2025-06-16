@@ -112,7 +112,7 @@ $formSetup = new FormSetup($db);
 // $item->setAsThirdpartyType();
 
 // Setup conf for a selection of a boolean
-// $formSetup->newItem('CONDENSEDDELIVERIES_MYPARAM5')->setAsYesNo();
+$formSetup->newItem('CD_OPEN_DIRECTLY_DELIVERY')->setAsYesNo();
 
 // Setup conf for a selection of an email template of type thirdparty
 // $formSetup->newItem('CONDENSEDDELIVERIES_MYPARAM6')->setAsEmailTemplate('thirdparty');

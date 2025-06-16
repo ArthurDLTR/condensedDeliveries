@@ -96,20 +96,21 @@ class ActionsCondensedDeliveries {
                         }
                         
                         $fk_parent_line = 0;
-                        
+                        $i = 0;
                         // Looping on each line of the order and add each one on the delivery
                         foreach ($lines as $line){
-                            // print 'Id ligne : '.$line->id." qty : ".$comm->expeditions[$line->id];
                             $desc = ($line->desc ? $line->desc : '');
                             // We have multiples orders to create only one delivery, we must put the ref of order on the invoice line
                             $desc = dol_concatdesc($desc, $langs->trans("Order").' '.$comm->ref.' - '.dol_print_date($comm->date, 'day'));
                             
                             $product_type = ($line->product_type ? $line->product_type : 0);
-    
+                            
                             // Reset fk_parent_line for no child products and special product
                             if (($line->product_type != 9 && empty($line->fk_parent_line)) || $lines[$i]->product_type == 9) {
                                 $fk_parent_line = 0;
                             }
+                            
+                            $i++;
                             
                             // Extrafields
                             if (method_exists($line, 'fetch_optionals')) {
@@ -120,7 +121,7 @@ class ActionsCondensedDeliveries {
                             $expe->context['createfromclone'] = 'createfromclone';
                             
                             $warehouse = getDolGlobalInt('MAIN_DEFAULT_WAREHOUSE');
-
+                            
                             if (empty($warehouse)){
                                 $waresql = "SELECT e.rowid as id FROM ".MAIN_DB_PREFIX."entrepot as e WHERE e.statut = 1";
                                 $wareres = $db->query($waresql);
@@ -129,6 +130,7 @@ class ActionsCondensedDeliveries {
                                     $warehouse = $wareobj->id;
                                 }
                             }
+                            // print 'Id entrepot : '.$warehouse." qty : ".$comm->expeditions[$line->id]."<br>";
 
                             if (empty($comm->expeditions[$line->id])){
                                 $lineqty = $line->qty;
@@ -248,11 +250,13 @@ class ActionsCondensedDeliveries {
                     // }
                     
                     // header("Location: ".$_SERVER['PHP_SELF'].'?'.$param);
-
-                    $texttoshow = $langs->trans('CD_CREATED_EXPE').' (<a href="'.DOL_URL_ROOT.'/expedition/card.php?id='.$expe->id.'">PROV'.$expe->id.'</a>)';
-                    setEventMessages($texttoshow, null, 'mesgs');
-
-                    // header("Location: ".DOL_URL_ROOT.'/expedition/card.php?id='.$expe->id);
+                    
+                    if (getDolGlobalInt('CD_OPEN_DIRECTLY_DELIVERY')){
+                        header("Location: ".DOL_URL_ROOT.'/expedition/card.php?id='.$expe->id);
+                    } else {
+                        $texttoshow = $langs->trans('CD_CREATED_EXPE').' (<a href="'.DOL_URL_ROOT.'/expedition/card.php?id='.$expe->id.'">PROV'.$expe->id.'</a>)';
+                        setEventMessages($texttoshow, null, 'mesgs');
+                    }
                 }
             } else {
                 // $comm->error = 'All the orders should have the same thirdparty';
