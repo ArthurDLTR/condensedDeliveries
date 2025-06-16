@@ -84,19 +84,22 @@ class ActionsCondensedDeliveries {
                     // $expe->add_object_linked('order', $id);
                     $arrayIds[] = $id;
                     $res = $comm->fetch($id);
-                    dol_syslog("Id de la commande : ".$id." Trouvé ? ".$res."<br>");
+                    // dol_syslog("Id de la commande : ".$id." Trouvé ? ".$res."<br>");
     
                     if ($res > 0){
+                        $comm->loadExpeditions();
+                        // var_dump($comm->expeditions);
                         $lines = $comm->lines;
                         if (empty($lines) && method_exists($comm, 'fetch_lines')) {
                             $comm->fetch_lines();
-                            $lines = $cmd->lines;
+                            $lines = $comm->lines;
                         }
                         
                         $fk_parent_line = 0;
                         
                         // Looping on each line of the order and add each one on the delivery
                         foreach ($lines as $line){
+                            // print 'Id ligne : '.$line->id." qty : ".$comm->expeditions[$line->id];
                             $desc = ($line->desc ? $line->desc : '');
                             // We have multiples orders to create only one delivery, we must put the ref of order on the invoice line
                             $desc = dol_concatdesc($desc, $langs->trans("Order").' '.$comm->ref.' - '.dol_print_date($comm->date, 'day'));
@@ -127,25 +130,34 @@ class ActionsCondensedDeliveries {
                                 }
                             }
 
-                            $result = $expe->addline(
-                                $warehouse,
-                                $line->id,
-                                $line->qty,
-                                $array_options
-                            );
-                            // print "ligne ajoutée produit ".$line->id. ' avec '.$line->qty.' en qty, est-ce ajoutée ? '.$result.'<br>';
-                            
-                            if ($result >= 0){
-                                $lineid = $result;
-                            } else {
-                                print $expe->error;
-                                print $expe->errorhidden;
-                                setEventMessages('Erreur lors de l\'ajout du produit '.$line->id, null, 'errors');
+                            if (empty($comm->expeditions[$line->id])){
+                                $lineqty = $line->qty;
+                            } else if ($line->qty > $comm->expeditions[$line->id]){
+                                $lineqty = $line->qty - $comm->expeditions[$line->id];
                             }
-                            // Define new fk_parent_line
-                            if ($result > 0 && $line->product_type == 9){
-                                $fk_parent_line = $result;
+                            if(!empty($lineqty)){
+                                // print 'Quantité restante à livrer : '.$lineqty.'<br>';
+                                $result = $expe->addline(
+                                    $warehouse,
+                                    $line->id,
+                                    $lineqty,
+                                    $array_options
+                                );
+                                // print "ligne ajoutée produit ".$line->id. ' avec '.$line->qty.' en qty, est-ce ajoutée ? '.$result.'<br>';
+                                
+                                if ($result >= 0){
+                                    $lineid = $result;
+                                } else {
+                                    print $expe->error;
+                                    print $expe->errorhidden;
+                                    setEventMessages('Erreur lors de l\'ajout du produit '.$line->id, null, 'errors');
+                                }
+                                // Define new fk_parent_line
+                                if ($result > 0 && $line->product_type == 9){
+                                    $fk_parent_line = $result;
+                                }
                             }
+                            $lineqty = null;
                         }
                     }
                 }
@@ -159,85 +171,88 @@ class ActionsCondensedDeliveries {
                 
                 if ($res > 0) {
                     $db->commit();
+                    
+                    // Make a redirect to avoid to create expedition twice if we make a refresh or back
+                    // $param = '';
+                    // if (!empty($mode)) {
+                    //     $param .= '&mode='.urlencode($mode);
+                    // }
+                    // if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) {
+                    //     $param .= '&contextpage='.urlencode($contextpage);
+                    // }
+                    // if ($limit > 0 && $limit != $conf->liste_limit) {
+                    //     $param .= '&limit='.((int) $limit);
+                    // }
+                    // if ($optioncss != '') {
+                    //     $param .= '&optioncss='.urlencode($optioncss);
+                    // }
+                    // if ($search_all) {
+                    //     $param .= '&search_all='.urlencode($search_all);
+                    // }
+                    // if ($show_files) {
+                    //     $param .= '&show_files='.urlencode($show_files);
+                    // }
+                    // if ($socid > 0) {
+                    //     $param .= '&socid='.urlencode($socid);
+                    // }
+                    // if ($search_status != '') {
+                    //     $param .= '&search_status='.urlencode($search_status);
+                    // }
+                    // if ($search_orderday) {
+                    //     $param .= '&search_orderday='.urlencode($search_orderday);
+                    // }
+                    // if ($search_ordermonth) {
+                    //     $param .= '&search_ordermonth='.urlencode($search_ordermonth);
+                    // }
+                    // if ($search_orderyear) {
+                    //     $param .= '&search_orderyear='.urlencode($search_orderyear);
+                    // }
+                    // if ($search_deliveryday) {
+                    //     $param .= '&search_deliveryday='.urlencode($search_deliveryday);
+                    // }
+                    // if ($search_deliverymonth) {
+                    //     $param .= '&search_deliverymonth='.urlencode($search_deliverymonth);
+                    // }
+                    // if ($search_deliveryyear) {
+                    //     $param .= '&search_deliveryyear='.urlencode($search_deliveryyear);
+                    // }
+                    // if ($search_ref) {
+                    //     $param .= '&search_ref='.urlencode($search_ref);
+                    // }
+                    // if ($search_company) {
+                    //     $param .= '&search_company='.urlencode($search_company);
+                    // }
+                    // if ($search_ref_customer) {
+                    //     $param .= '&search_ref_customer='.urlencode($search_ref_customer);
+                    // }
+                    // if ($search_user > 0) {
+                    //     $param .= '&search_user='.urlencode($search_user);
+                    // }
+                    // if ($search_sale > 0) {
+                    //     $param .= '&search_sale='.urlencode($search_sale);
+                    // }
+                    // if ($search_total_ht != '') {
+                    //     $param .= '&search_total_ht='.urlencode($search_total_ht);
+                    // }
+                    // if ($search_total_vat != '') {
+                    //     $param .= '&search_total_vat='.urlencode($search_total_vat);
+                    // }
+                    // if ($search_total_ttc != '') {
+                    //     $param .= '&search_total_ttc='.urlencode($search_total_ttc);
+                    // }
+                    // if ($search_project_ref >= 0) {
+                    //     $param .= "&search_project_ref=".urlencode($search_project_ref);
+                    // }
+                    // if ($search_billed != '') {
+                    //     $param .= '&search_billed='.urlencode($search_billed);
+                    // }
+                    
+                    // header("Location: ".$_SERVER['PHP_SELF'].'?'.$param);
+
                     $texttoshow = $langs->trans('CD_CREATED_EXPE').' (<a href="'.DOL_URL_ROOT.'/expedition/card.php?id='.$expe->id.'">PROV'.$expe->id.'</a>)';
                     setEventMessages($texttoshow, null, 'mesgs');
-    
-                    // Make a redirect to avoid to create expedition twice if we make a refresh or back
-                    $param = '';
-                    if (!empty($mode)) {
-                        $param .= '&mode='.urlencode($mode);
-                    }
-                    if (!empty($contextpage) && $contextpage != $_SERVER["PHP_SELF"]) {
-                        $param .= '&contextpage='.urlencode($contextpage);
-                    }
-                    if ($limit > 0 && $limit != $conf->liste_limit) {
-                        $param .= '&limit='.((int) $limit);
-                    }
-                    if ($optioncss != '') {
-                        $param .= '&optioncss='.urlencode($optioncss);
-                    }
-                    if ($search_all) {
-                        $param .= '&search_all='.urlencode($search_all);
-                    }
-                    if ($show_files) {
-                        $param .= '&show_files='.urlencode($show_files);
-                    }
-                    if ($socid > 0) {
-                        $param .= '&socid='.urlencode($socid);
-                    }
-                    if ($search_status != '') {
-                        $param .= '&search_status='.urlencode($search_status);
-                    }
-                    if ($search_orderday) {
-                        $param .= '&search_orderday='.urlencode($search_orderday);
-                    }
-                    if ($search_ordermonth) {
-                        $param .= '&search_ordermonth='.urlencode($search_ordermonth);
-                    }
-                    if ($search_orderyear) {
-                        $param .= '&search_orderyear='.urlencode($search_orderyear);
-                    }
-                    if ($search_deliveryday) {
-                        $param .= '&search_deliveryday='.urlencode($search_deliveryday);
-                    }
-                    if ($search_deliverymonth) {
-                        $param .= '&search_deliverymonth='.urlencode($search_deliverymonth);
-                    }
-                    if ($search_deliveryyear) {
-                        $param .= '&search_deliveryyear='.urlencode($search_deliveryyear);
-                    }
-                    if ($search_ref) {
-                        $param .= '&search_ref='.urlencode($search_ref);
-                    }
-                    if ($search_company) {
-                        $param .= '&search_company='.urlencode($search_company);
-                    }
-                    if ($search_ref_customer) {
-                        $param .= '&search_ref_customer='.urlencode($search_ref_customer);
-                    }
-                    if ($search_user > 0) {
-                        $param .= '&search_user='.urlencode($search_user);
-                    }
-                    if ($search_sale > 0) {
-                        $param .= '&search_sale='.urlencode($search_sale);
-                    }
-                    if ($search_total_ht != '') {
-                        $param .= '&search_total_ht='.urlencode($search_total_ht);
-                    }
-                    if ($search_total_vat != '') {
-                        $param .= '&search_total_vat='.urlencode($search_total_vat);
-                    }
-                    if ($search_total_ttc != '') {
-                        $param .= '&search_total_ttc='.urlencode($search_total_ttc);
-                    }
-                    if ($search_project_ref >= 0) {
-                        $param .= "&search_project_ref=".urlencode($search_project_ref);
-                    }
-                    if ($search_billed != '') {
-                        $param .= '&search_billed='.urlencode($search_billed);
-                    }
-    
-                    header("Location: ".$_SERVER['PHP_SELF'].'?'.$param);
+
+                    // header("Location: ".DOL_URL_ROOT.'/expedition/card.php?id='.$expe->id);
                 }
             } else {
                 // $comm->error = 'All the orders should have the same thirdparty';
