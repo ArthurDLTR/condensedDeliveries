@@ -41,7 +41,7 @@ class ActionsCondensedDeliveries {
         global $arrayofaction, $langs;
         // var_dump($langs);
         $langs->loadLangs(array("condenseddeliveries@condenseddeliveries"));
-        $label = img_picto('', 'dollyrevert', 'style="color:black"').$langs->trans("CreateCondensedDeliveries");
+        $label = '<img width="15px" height="15px" src="'.DOL_URL_ROOT.'/custom/condenseddeliveries/img/object_createdelivery.png"><span> '.$langs->trans("CreateCondensedDeliveries").'</span>';
         
         $this->resprints = '<option value="CREATE_CONDENSED_DELIVERIES" data-html="'. dol_escape_htmltag($label) .'"> '. $label .'</option>';
         return 0;
