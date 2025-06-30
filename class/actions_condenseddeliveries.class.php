@@ -59,11 +59,11 @@ class ActionsCondensedDeliveries {
 
         $langs->load("condenseddeliveries@condenseddeliveries");
 
+        $db->begin();
         if(GETPOST('massaction') == 'CREATE_CONDENSED_DELIVERIES'){
 
             $arrayOrders = GETPOST('toselect', 'array');
             
-            $db->begin();
     
             $comm = new Commande($db);
             $expe = new Expedition($db);
@@ -148,7 +148,7 @@ class ActionsCondensedDeliveries {
                                 
                                 if ($result >= 0){
                                     $lineid = $result;
-                                    $expe->lines[count($expe->lines) - 1]->rang = $i + 1;
+                                    $expe->lines[count($expe->lines) - 1]->rang = count($expe->lines);
                                 } else {
                                     print $expe->error;
                                     print $expe->errorhidden;
@@ -171,6 +171,9 @@ class ActionsCondensedDeliveries {
                 foreach ($arrayIds as $id){
                     $expe->add_object_linked('order', $id);
                 }
+
+                $expe->array_options['created_by_condenseddeliveries'] = 1;
+                $expe->insertExtraFields();
                 
                 if ($res > 0) {
                     $db->commit();
@@ -262,6 +265,40 @@ class ActionsCondensedDeliveries {
             } else {
                 // $comm->error = 'All the orders should have the same thirdparty';
                 setEventMessages($langs->trans("CD_NOT_SAME_THIRDPARTY"), null, 'errors');
+            }
+        }
+
+        if ($object->element == 'shipping'){
+            $object->fetch_optionals();
+            // Check if the shipment was created using this module to only reorganise the concerned shipments
+            if ($object->array_options['options_created_by_condenseddeliveries'] == 1){
+                if (empty($object->lines)){
+                    $object->fetch_lines();
+                }
+                
+                // SQL request to get the rank of each element in the shipping lines 
+                $sql = 'SELECT e.fk_origin_line as origin_id, e.rang as rang FROM '.MAIN_DB_PREFIX.'expeditiondet as e';
+                $sql.= ' WHERE e.fk_expedition = '.$object->id;
+
+                $resql = $db->query($sql);
+
+                if ($resql) {
+                    $num = $db->num_rows($resql);
+                    // Reorganise the order of the products based on the rank registered in the database
+                    for($i = 0; $i < $num; $i++){
+                        $obj = $db->fetch_object($resql);
+                        print 'sql : Id : '. $obj->origin_id.' rang : '.$obj->rang.'<br>';
+                        for ($j = 0; $j < count($object->lines); $j++){
+                            if ($object->lines[$j]->fk_origin_line == $obj->origin_id){
+                                $object->lines[$j]->rang = $obj->rang;
+                                break;
+                            }
+                        }
+                    }
+                }
+                for($i = 0; $i < $num; $i++){
+                    print 'Id : '. $object->lines[$i]->fk_origin_line.' rang : '.$object->lines[$i]->rang.'<br>';
+                }
             }
         }
     }

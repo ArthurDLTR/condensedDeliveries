@@ -114,7 +114,7 @@ class modCondensedDeliveries extends DolibarrModules
 				//   '/condenseddeliveries/js/condenseddeliveries.js.php',
 			),
 			// Set here all hooks context managed by module. To find available hook context, make a "grep -r '>initHooks(' *" on source code. You can also set hook context to 'all'
-			'hooks' => array('orderlist'),
+			'hooks' => array('orderlist', 'expeditioncard'),
 			// Set this to 1 if features of module are opened to external users
 			'moduleforexternal' => 0,
 		);
@@ -444,9 +444,9 @@ class modCondensedDeliveries extends DolibarrModules
 		}
 
 		// Create extrafields during init
-		//include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
-		//$extrafields = new ExtraFields($this->db);
-		//$result1=$extrafields->addExtraField('condenseddeliveries_myattr1', "New Attr 1 label", 'boolean', 1,  3, 'thirdparty',   0, 0, '', '', 1, '', 0, 0, '', '', 'condenseddeliveries@condenseddeliveries', 'isModEnabled("condenseddeliveries")');
+		include_once DOL_DOCUMENT_ROOT.'/core/class/extrafields.class.php';
+		$extrafields = new ExtraFields($this->db);
+		$result1=$extrafields->addExtraField('created_by_condenseddeliveries', $langs->trans("CONDENSED_DELIVERIES_CREATED_BY"), 'boolean', 1,  3, 'expedition', 0, 0, '0', '', 0, '', 0, 0, '', '', 'condenseddeliveries@condenseddeliveries', 'isModEnabled("condenseddeliveries")');
 		//$result2=$extrafields->addExtraField('condenseddeliveries_myattr2', "New Attr 2 label", 'varchar', 1, 10, 'project',      0, 0, '', '', 1, '', 0, 0, '', '', 'condenseddeliveries@condenseddeliveries', 'isModEnabled("condenseddeliveries")');
 		//$result3=$extrafields->addExtraField('condenseddeliveries_myattr3', "New Attr 3 label", 'varchar', 1, 10, 'bank_account', 0, 0, '', '', 1, '', 0, 0, '', '', 'condenseddeliveries@condenseddeliveries', 'isModEnabled("condenseddeliveries")');
 		//$result4=$extrafields->addExtraField('condenseddeliveries_myattr4', "New Attr 4 label", 'select',  1,  3, 'thirdparty',   0, 1, '', array('options'=>array('code1'=>'Val1','code2'=>'Val2','code3'=>'Val3')), 1,'', 0, 0, '', '', 'condenseddeliveries@condenseddeliveries', 'isModEnabled("condenseddeliveries")');

@@ -57,3 +57,4 @@ CreateCondensedDeliveries = Create delivery
 CD_CREATED_EXPE = Delivery created
 CD_NOT_SAME_THIRDPARTY = All the orders should have the same thirdparty
 CD_OPEN_DIRECTLY_DELIVERY = Open directly the delivery 
+CONDENSED_DELIVERIES_CREATED_BY = Created by the module CondensedDeliveries

@@ -57,3 +57,4 @@ CreateCondensedDeliveries = Créer une expédition
 CD_CREATED_EXPE = Expédition créée
 CD_NOT_SAME_THIRDPARTY = Toutes les commandes doivent avoir le même Tiers
 CD_OPEN_DIRECTLY_DELIVERY = Ouvrir directement l'expédition créée
+CONDENSED_DELIVERIES_CREATED_BY = Créée par le module BL Fusionnés (CondensedDeliveries)
