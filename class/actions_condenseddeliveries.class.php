@@ -95,7 +95,7 @@ class ActionsCondensedDeliveries {
                             $lines = $comm->lines;
                         }
                         
-                        $fk_parent_line = 0;
+                        // $fk_parent_line = 0;
                         $i = 0;
                         // Looping on each line of the order and add each one on the delivery
                         foreach ($lines as $line){
@@ -106,11 +106,10 @@ class ActionsCondensedDeliveries {
                             $product_type = ($line->product_type ? $line->product_type : 0);
                             
                             // Reset fk_parent_line for no child products and special product
-                            if (($line->product_type != 9 && empty($line->fk_parent_line)) || $lines[$i]->product_type == 9) {
-                                $fk_parent_line = 0;
-                            }
+                            // if (($line->product_type != 9 && empty($line->fk_parent_line)) || $lines[$i]->product_type == 9) {
+                            //     $fk_parent_line = 0;
+                            // }
                             
-                            $i++;
                             
                             // Extrafields
                             if (method_exists($line, 'fetch_optionals')) {
@@ -149,17 +148,19 @@ class ActionsCondensedDeliveries {
                                 
                                 if ($result >= 0){
                                     $lineid = $result;
+                                    $expe->lines[count($expe->lines) - 1]->rang = $i + 1;
                                 } else {
                                     print $expe->error;
                                     print $expe->errorhidden;
                                     setEventMessages('Erreur lors de l\'ajout du produit '.$line->id, null, 'errors');
                                 }
                                 // Define new fk_parent_line
-                                if ($result > 0 && $line->product_type == 9){
-                                    $fk_parent_line = $result;
-                                }
+                                // if ($result > 0 && $line->product_type == 9){
+                                //     $fk_parent_line = $result;
+                                // }
                             }
                             $lineqty = null;
+                            $i++;
                         }
                     }
                 }
