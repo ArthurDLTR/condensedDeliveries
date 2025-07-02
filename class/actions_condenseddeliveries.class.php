@@ -176,8 +176,8 @@ class ActionsCondensedDeliveries {
                     $expe->add_object_linked('order', $id);
                 }
 
-                $expe->array_options['created_by_condenseddeliveries'] = 1;
-                $expe->insertExtraFields();
+                // $expe->array_options['created_by_condenseddeliveries'] = 1;
+                // $expe->insertExtraFields();
                 
                 if ($res > 0) {
                     $db->commit();
