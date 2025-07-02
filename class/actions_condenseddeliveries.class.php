@@ -149,6 +149,10 @@ class ActionsCondensedDeliveries {
                                 if ($result >= 0){
                                     $lineid = $result;
                                     $expe->lines[count($expe->lines) - 1]->rang = count($expe->lines);
+                                    // Modify the value of "rang" in llx_commandedet to organize correctly the products in the expedition created
+                                    $rangsql = "UPDATE ".MAIN_DB_PREFIX."commandedet as c SET c.rang = ".count($expe->lines)." WHERE c.rowid = ".$line->id;
+                                    // print 'requete sql pour mettre à jour ligne de commande : '.$rangsql.'<br>';
+                                    $rangres = $db->query($rangsql);
                                 } else {
                                     print $expe->error;
                                     print $expe->errorhidden;
@@ -310,34 +314,34 @@ class ActionsCondensedDeliveries {
      * @param   action          current action
      * @return  int             -1 to throw an error, 0 if no error
      */
-    public function printObjectLine($parameters, $object, $action){
-        global $db, $conf, $langs, $user, $my_soc;
-        if ($object->element == 'shipping'){
-            if (empty($object->array_options)){
-                $object->fetch_optionals();
-            }
+    // public function printObjectLine($parameters, $object, $action){
+    //     global $db, $conf, $langs, $user, $my_soc;
+    //     if ($object->element == 'shipping'){
+    //         if (empty($object->array_options)){
+    //             $object->fetch_optionals();
+    //         }
 
-            if ($object->array_options['options_created_by_condenseddeliveries'] == 1){
-                if (empty($object->lines)){
-                    $object->fetch_lines();
-                }
+    //         if ($object->array_options['options_created_by_condenseddeliveries'] == 1){
+    //             if (empty($object->lines)){
+    //                 $object->fetch_lines();
+    //             }
                 
-                // SQL request to get the rank of each element in the shipping lines 
-                $sql = 'SELECT e.rowid as id, e.rang as rang FROM '.MAIN_DB_PREFIX.'expeditiondet as e';
-                $sql.= ' WHERE e.fk_expedition = '.$object->id;
-                $sql.= ' AND e.rang = '.($parameters['i'] + 1).'<br>';
+    //             // SQL request to get the rank of each element in the shipping lines 
+    //             $sql = 'SELECT e.rowid as id, e.rang as rang FROM '.MAIN_DB_PREFIX.'expeditiondet as e';
+    //             $sql.= ' WHERE e.fk_expedition = '.$object->id;
+    //             $sql.= ' AND e.rang = '.($parameters['i'] + 1).'<br>';
 
-                print 'SQL : '.$sql;
+    //             print 'SQL : '.$sql;
 
-                $resql = $db->query($sql);
+    //             $resql = $db->query($sql);
 
-                if ($resql) {
-                    $obj = $db->fetch_object($resql);
-                    $expe_line = new ExpeditionLigne($db);
-                    $expe_line->fetch($obj->id);
-                    $object->lines[$parameters['i']] = $expe_line;
-                }
-            }
-        }
-    }
+    //             if ($resql) {
+    //                 $obj = $db->fetch_object($resql);
+    //                 $expe_line = new ExpeditionLigne($db);
+    //                 $expe_line->fetch($obj->id);
+    //                 $object->lines[$parameters['i']] = $expe_line;
+    //             }
+    //         }
+    //     }
+    // }
 }
