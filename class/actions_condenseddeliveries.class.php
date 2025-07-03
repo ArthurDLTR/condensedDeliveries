@@ -27,6 +27,7 @@
 
 include_once DOL_DOCUMENT_ROOT.'/commande/class/commande.class.php';
 include_once DOL_DOCUMENT_ROOT.'/expedition/class/expedition.class.php';
+include_once DOL_DOCUMENT_ROOT.'/product/class/product.class.php';
 include_once DOL_DOCUMENT_ROOT.'/custom/condenseddeliveries/class/CondensedDeliveries.class.php';
 
 class ActionsCondensedDeliveries {
@@ -131,12 +132,24 @@ class ActionsCondensedDeliveries {
                             }
                             // print 'Id entrepot : '.$warehouse." qty : ".$comm->expeditions[$line->id]."<br>";
 
+                            $product = new Product($db);
+                            $product->fetch($line->fk_product);
+
+                            $stcok_prod = 0;
+                            if (!empty($product->stock_reel)){
+                                $stock_prod = $product->stock_reel;
+                            }
+
+
                             if (empty($comm->expeditions[$line->id])){
                                 $lineqty = $line->qty;
                             } else if ($line->qty > $comm->expeditions[$line->id]){
                                 $lineqty = $line->qty - $comm->expeditions[$line->id];
                             }
                             if(!empty($lineqty)){
+                                if ($lineqty > $stock_prod){
+                                    $lineqty = $stock_prod;
+                                }
                                 // print 'Quantité restante à livrer : '.$lineqty.'<br>';
                                 $result = $expe->addline(
                                     $warehouse,
@@ -149,10 +162,6 @@ class ActionsCondensedDeliveries {
                                 if ($result >= 0){
                                     $lineid = $result;
                                     $expe->lines[count($expe->lines) - 1]->rang = count($expe->lines);
-                                    // Modify the value of "rang" in llx_commandedet to organize correctly the products in the expedition created
-                                    $rangsql = "UPDATE ".MAIN_DB_PREFIX."commandedet as c SET c.rang = ".count($expe->lines)." WHERE c.rowid = ".$line->id;
-                                    // print 'requete sql pour mettre à jour ligne de commande : '.$rangsql.'<br>';
-                                    $rangres = $db->query($rangsql);
                                 } else {
                                     print $expe->error;
                                     print $expe->errorhidden;
@@ -160,9 +169,13 @@ class ActionsCondensedDeliveries {
                                 }
                                 // Define new fk_parent_line
                                 // if ($result > 0 && $line->product_type == 9){
-                                //     $fk_parent_line = $result;
-                                // }
+                                    //     $fk_parent_line = $result;
+                                    // }
                             }
+                            // Modify the value of "rang" in llx_commandedet to organize correctly the products in the expedition created
+                            $rangsql = "UPDATE ".MAIN_DB_PREFIX."commandedet as c SET c.rang = ".count($expe->lines)." WHERE c.rowid = ".$line->id;
+                            // print 'requete sql pour mettre à jour ligne de commande : '.$rangsql.'<br>';
+                            $rangres = $db->query($rangsql);
                             $lineqty = null;
                             $i++;
                         }
