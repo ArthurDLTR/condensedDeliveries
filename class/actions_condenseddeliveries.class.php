@@ -60,8 +60,10 @@ class ActionsCondensedDeliveries {
 
         $langs->load("condenseddeliveries@condenseddeliveries");
 
-        $db->begin();
+        // print 'massaction : '.GETPOST('massaction');
+
         if(GETPOST('massaction') == 'CREATE_CONDENSED_DELIVERIES'){
+            $db->begin();
 
             $arrayOrders = GETPOST('toselect', 'array');
             
