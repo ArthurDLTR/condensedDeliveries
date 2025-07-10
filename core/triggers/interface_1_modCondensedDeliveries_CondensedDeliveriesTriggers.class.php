@@ -71,16 +71,19 @@ class InterfaceCondensedDeliveriesTriggers extends DolibarrTriggers
 
         switch ($action) {
             case 'SHIPPING_VALIDATE':
-                $object->fetchObjectLinked(null, 'commande', $object->id, 'shipping');
-                // var_dump($object->linkedObjects);
-                // print 'VAR DUMP pour l\'object seul : <br>';
-                // var_dump($object->linkedObjects["commande"]);
-                // print 'VAR DUMP pour les ids des objets liés : <br>';
-                // var_dump($object->linkedObjectsIds);
-                // print "Object lié : ".$object->linkedObjects[0]['element'].' et son id : '.$object->linkedObjects[0]['id'].'<br>';
-                foreach ($object->linkedObjects["commande"] as $linkedobj){
-                    print "Object lié : ".$linkedobj->id.'<br>';
-                    $object->setStatut(Commande::STATUS_CLOSED, $linkedobj->id, 'commande');
+                if (getDolGlobalString('WORKFLOW_ORDER_CLASSIFY_SHIPPED_SHIPPING')){
+                    $object->fetchObjectLinked(null, 'commande', $object->id, 'shipping');
+                    // var_dump($object->linkedObjects);
+                    // print 'VAR DUMP pour l\'object seul : <br>';
+                    // var_dump($object->linkedObjects["commande"]);
+                    // print 'VAR DUMP pour les ids des objets liés : <br>';
+                    // var_dump($object->linkedObjectsIds);
+                    // print "Object lié : ".$object->linkedObjects[0]['element'].' et son id : '.$object->linkedObjects[0]['id'].'<br>';
+                    foreach ($object->linkedObjects["commande"] as $linkedobj){
+                        // print "Object lié : ".$linkedobj->id.'<br>';
+                        // Besoin de gérer le cas où tout n'est pas encore expédié et le statut serait STATUS_SHIPMENTONPROGRESS au lieu de STATUS_CLOSED
+                        $object->setStatut(Commande::STATUS_CLOSED, $linkedobj->id, 'commande');
+                    }
                 }
                 break;
             default:
