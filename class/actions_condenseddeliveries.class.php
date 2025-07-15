@@ -148,9 +148,12 @@ class ActionsCondensedDeliveries {
                             } else if ($line->qty > $comm->expeditions[$line->id]){
                                 $lineqty = $line->qty - $comm->expeditions[$line->id];
                             }
-                            if(!empty($lineqty) && $stock_prod > 0){
+                            if(!empty($lineqty)){
                                 if ($lineqty > $stock_prod){
                                     $lineqty = $stock_prod;
+                                }
+                                if ($lineqty < 0){
+                                    $lineqty = 0;
                                 }
                                 // print 'Quantité restante à livrer : '.$lineqty.'<br>';
                                 $result = $expe->addline(

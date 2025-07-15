@@ -1,5 +1,8 @@
 # CHANGELOG CONDENSEDDELIVERIES FOR [DOLIBARR ERP CRM](https://www.dolibarr.org)
 
+## 0.5 
+Gestion du statut des commandes d'origine des expéditions.
+
 ## 0.4
 Réorganisation des produits dans les expéditions créées par le module et prise en compte du stock pour la quantité de produit dans l'expédition.
 
