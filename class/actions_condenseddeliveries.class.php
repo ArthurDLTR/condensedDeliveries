@@ -137,7 +137,7 @@ class ActionsCondensedDeliveries {
                             $product = new Product($db);
                             $product->fetch($line->fk_product);
 
-                            $stcok_prod = 0;
+                            $stock_prod = 0;
                             if (!empty($product->stock_reel)){
                                 $stock_prod = $product->stock_reel;
                             }
@@ -148,7 +148,7 @@ class ActionsCondensedDeliveries {
                             } else if ($line->qty > $comm->expeditions[$line->id]){
                                 $lineqty = $line->qty - $comm->expeditions[$line->id];
                             }
-                            if(!empty($lineqty)){
+                            if(!empty($lineqty) && $stock_prod > 0){
                                 if ($lineqty > $stock_prod){
                                     $lineqty = $stock_prod;
                                 }

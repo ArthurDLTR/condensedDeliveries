@@ -72,6 +72,8 @@ class InterfaceCondensedDeliveriesTriggers extends DolibarrTriggers
         switch ($action) {
             case 'SHIPPING_VALIDATE':
                 if (getDolGlobalString('WORKFLOW_ORDER_CLASSIFY_SHIPPED_SHIPPING')){
+                    include_once DOL_DOCUMENT_ROOT.'/custom/condenseddeliveries/class/CondensedDeliveries.class.php';
+                    $conDel = new CondensedDeliveries($this->db);
                     $object->fetchObjectLinked(null, 'commande', $object->id, 'shipping');
                     // var_dump($object->linkedObjects);
                     // print 'VAR DUMP pour l\'object seul : <br>';
@@ -81,8 +83,13 @@ class InterfaceCondensedDeliveriesTriggers extends DolibarrTriggers
                     // print "Object lié : ".$object->linkedObjects[0]['element'].' et son id : '.$object->linkedObjects[0]['id'].'<br>';
                     foreach ($object->linkedObjects["commande"] as $linkedobj){
                         // print "Object lié : ".$linkedobj->id.'<br>';
-                        // Besoin de gérer le cas où tout n'est pas encore expédié et le statut serait STATUS_SHIPMENTONPROGRESS au lieu de STATUS_CLOSED
-                        $object->setStatut(Commande::STATUS_CLOSED, $linkedobj->id, 'commande');
+                        // Checking for each order if every product has been delivered
+                        $resDel = $conDel->checkOrderStatus($linkedobj->id);
+                        if ($resDel > 0){ // Every product has been delivered, we change the status of the order to "Delivered"
+                            $object->setStatut(Commande::STATUS_CLOSED, $linkedobj->id, 'commande');
+                        } else if ($resDel == 0){ // The order is partially delivered, we change the status of the order to "Shipment on process"
+                            $object->setStatut(Commande::STATUS_SHIPMENTONPROCESS, $linkedobj->id, 'commande');
+                        }
                     }
                 }
                 break;

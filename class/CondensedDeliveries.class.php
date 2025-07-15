@@ -64,4 +64,36 @@ class CondensedDeliveries extends CommonObject {
         }
         return 1;
     }
+
+    /**
+     * Checking if an order has been completely delivered or its shipment is in progress
+     * 
+     * @param       int     $orderId    id of the order
+     * 
+     * @return      int                 1 if all the products are delivered, 0 if partially delivered, -1 if KO
+     */
+    public function checkOrderStatus($orderId){
+        $comm = new Commande($this->db);
+        $res = $comm->fetch($orderId);
+        if ($res > 0){
+            $comm->loadExpeditions();
+            $lines = $comm->lines;
+            if (empty($lines) && method_exists($comm, 'fetch_lines')) {
+                $comm->fetch_lines();
+                $lines = $comm->lines;
+            }
+            foreach ($lines as $line){
+                if(empty($comm->expeditions[$line->id])){ // The product has a quantity of 0 delivered, the shipment for this order is in progress
+                    return 0;
+                } else if ($line->qty > $comm->expeditions[$line->id]){ // The product was partially delivered, the shipment for this order is in progress
+                    return 0;
+                } else if ($line->qty <= $comm->expeditions[$line->id]){ // The quantity delivered is the same or superior than the quantity in the order, the shipment is delivered
+                    continue;
+                }
+            }
+            // All the products are completely delivered
+            return 1;
+        }
+        return -1;
+    }
 }
